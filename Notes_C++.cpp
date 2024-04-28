@@ -418,3 +418,201 @@ int main()
 	cout << "test" << endl;
 	
 }
+
+
+==========================================================================================================
+overloading of dot and arrow operator
+*this -- return clone of object
+this return pointer
+class Myclass
+{
+	int num;
+public:
+	void disp()
+	{
+		cout <<"in disp funciton" << endl;
+	}
+
+	Myclass& operator*()
+	{
+		return *this;
+	}
+	Myclass* operator->()
+	{
+		return this;
+	}
+};
+int main()
+{
+	Myclass m;
+	(*m).disp();
+	m->disp();
+}
+==========================================================================================================
+
+	Memory leak handling:-
+	smart pointer -- shared ptr , unique ptr;
+
+they are implemented by using RAII concept: --
+	Resource Aquisition in Initialization
+
+
+#include<iostream>
+using namespace std;
+
+class Myclass
+{
+public:
+	void disp()
+	{
+		cout << "myclas disp" << endl;
+	}
+	Myclass()
+	{
+		cout << "Myclass ctor" << endl;
+	}
+	~Myclass()
+	{
+		cout << "Myclass dtor" << endl;
+	}
+};
+template<typename A>
+class Wrapper
+{
+	A* classptr;
+public:
+	Wrapper(A* ptr):classptr(ptr)
+	{
+		cout << "inside ctor" << endl;
+	}
+	~Wrapper()
+	{
+		cout << "dctor" << endl;
+		delete classptr;
+	}
+	A& operator*()
+	{
+		return *classptr;
+	}
+	A* operator->()
+	{
+		return classptr;
+	}
+};
+
+int main()
+{
+	//Wrapper<int>obj1(new int(10));
+	Wrapper<Myclass>obj2(new Myclass());
+	(*obj2).disp();
+	obj2->disp();
+	return 0;
+}
+
+==========================================================================================================
+can constructor be virtual ? No
+The compiler must be aware of the class type to create the object. In other words, what type of object to be created is a compile-time decision from the C++ compiler perspective. If we make a constructor virtual, the compiler flags an error. 
+==========================================================================================================
+
+factory design pattern
+https://www.geeksforgeeks.org/advanced-c-virtual-constructor/
+
+
+==========================================================================================================
+
+*** Virtual info  *** 
+
+A VTABLE contains addresses of virtual functions.The compiler creates a VTABLE for each class that contains virtual functions and for classes that are derived from it.The VTABLE contains the addresses in the order in which virtual functions are defined within the class.
+
+Whenever we create an object of the class,the class gets loaded into the memory and VTABLE gets created.
+
+The address of the VTABLE stored in the object is known as VPTR.
+
+The VTABLE belongs to a class.All objects of the class share the same VTABLE. The objects contain the address of the VTABLE in their first 2 bytes(under DOS) or in first 4 bytes(under Windows).
+That is there is only one VTABLE per class and There is one VPTR per object.
+
+
+Virtual function vs. Normal function
+
+The call to virtual function is resolved at runtime.Moreover the call is resolved after retrieving the address of the function from the VTABLE.This consumes time.
+
+The call to normal function is resolved at compile time. Also there is no mechanism of VTABLE involved in calling the normal function.
+
+
+static functions can not be virtual because they are not related to objects.
+
+
+Why member functions are not virtual by default?
+	The mechanism of virtual functions is not very efficient.As compared to a simple call to an absolute address,there are more sophisticated assembly instructions required to set up the virtual function call.This requires both code space and execution time.All non-virtual function calls are implemented through early binding and all virtual function calls are implemented through late binding.Thus,had all function calls in C++ been implemented through late binding,the efficiency would have suffered heavily. 
+Hence the virtual function is an option,and by default the language uses the non-virtual mechanism which is of course faster.
+
+
+
+why destructors are not virtual by default?
+
+base *b;
+b=new sub;
+Here,the base class constructor would be called followed by a call to sub class constructor.
+If we say "delete b" then destruction should be proceed from sub to base.This can be ensured by declaring the base class destructor as "virtual".
+When we declare virtual destructor,time spent in building the VTABLE. If we do not intend to create objects through new then there is no need for base class destructor to be virtual.Hence there is no need to create VTABLE.
+Had destructors been virtual by default then unnecessarily time would have been spent for building VTABLE even if you don't need it.Hence destructors are not made virtual by default.
+
+
+
+
+**** Late Binding ***** 
+
+Connecting a function call to a function body is called binding. 
+	When binding is performed before the program is run (by the compiler and linker), it is called by early binding.
+	When binding is performed during program execution (runtime) , it is called a Late Binding.
+	To cause a late binding to occur for a particular function, C++ requires that u use the "virtual" keyword when defining the function in the base class.
+
+Late binding occurs only with virtual functions and only when u r using pointer to base class or reference to base class.
+If a function is defined as "virtual" in the base class, it is "virtual" in all the derived class. The redefinition of a "virtual" function in a derived class is called as "overriding".
+	The keyword "virtual" tells the compiler it should not perform early binding. Instead, it should automatically install all the mechanisms necessary to perform late binding. This means that if u call "draw()" function for a "Triangle" instance through "pointer of Shape" or "reference of shape", u will get proper function invocation.
+	To accomplish this, the compiler creates a single table (called VTABLE) for each class that contains "virtual" functions. The compiler places the addresses of the virtual functions for that particular class in the VTABLE. In each class with virtual functions, it secretly places a pointer, called the vptr (virtual pointer i.e. VPTR), which points to the VTABLE for that object. 
+When u make a virtual function call through a base class pointer or reference ( that is when u make polymorphic call ), the compiler quietly inserts code to fetch the VPTR and look up the function address in the VTABLE, thus calling correct function and causing late binding to take place.
+	All of this - setting up the VTABLE for each class, initializing the VPTR, inserting the code for the virtual function call - happens automatically, so u don't have to worry about it. With virtual functions, the proper function gets called for an object, even if the compiler cannot know the specific type of the object.
+
+compiler's instrctions:-
+	when compiler encounters any polymorphic call, it generates code like
+a) see the content of base class pointer
+b) access the object
+c) get the vptr
+d) call vptr+index function
+
+( if there are 2 virtual functions defined in the order "disp1" and "disp2" respectively , then disp1 will be at index 0 and disp2 will be at index 1)
+
+so if u call disp2, instruction (d) will be, call vptr+1 function.
+
+
+
+=============================================
+no separate vptr in child class , base class vptr is inherited 
+
+
+-- vtable is created for a class not for each object
+-- it is nothing but a static array containgn addres of virtual function pointers
+-- vptr for each class is initialized with address of vtable of that class by compiler itself
+--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
