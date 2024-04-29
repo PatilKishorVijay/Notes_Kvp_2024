@@ -585,26 +585,365 @@ d) call vptr+index function
 
 so if u call disp2, instruction (d) will be, call vptr+1 function.
 
+==========================================================================================
 
+****vptr providede by compiler for each object . it is also inherited.
+**** vtable is an static array and it is bind to class level not object level
+*** when we create object , in constructor vptr is gets initialised to vtable's address of that particular class
 
-=============================================
+==========================================================================================
 no separate vptr in child class , base class vptr is inherited 
 
+
+youtube--- saurabh shukla playlist 
 
 -- vtable is created for a class not for each object
 -- it is nothing but a static array containgn addres of virtual function pointers
 -- vptr for each class is initialized with address of vtable of that class by compiler itself
---
+-- if virtual functin is presaetnin any class :-
+	compiler does 2 tasks :-
+		-- creates a vtable
+		-- initialises a vptr for an instance with the address of vtabel
+
+
+==========================================================================================
+
+---***  using parent class pointer or reference u can invoke only those methods which are available in parent class.
+
+==========================================================================================
+*** why vtable is for all classes is separate ?
+class D : public A, public B, public C {.........}
+
+If we dont store the base classes' vptrs in derived objects, that means you have to club all the virtual functions of all the base
+classes (in case of multiple inheritance) into one vtbl that has a single vptr that will be stored in your object. Now, no problem in
+accessing virtual functions of first subobject (like class A in the above code snippet) whose virtual function pointers are stored in
+starting location of vtbl. But what happens in accessing other subobjects (like classes B and C in the above code snippet) virtual
+functions. Their offsets will get disturbed as you have clubbed all the virtual functions into one vtbl. After all, compiler will access
+virtual functions with their offsets only. Now you dont know what will be get called.
+
+
+==========================================================================================
+
+
+Copy COnstructor:- 
+if in child class CC is not provided:-
+	1) it will call base class CC implicitley
+If we provided CC in child class , then it will call base class default constructor implicitly
+to avoid that we have to call base class CC explicilty
+
+If base class dont have CC then compiler provided CC gets called.
+
+
+
+==========================================================================================
+
+
+
+			**** Casting ****
+1) static_cast:- 
+
+
+int main()
+{
+	char c;
+	int* p1 = (int*)(&c);   
+	*p1 = 3;    //will pass at compile time but will crash at runtime
+
+	// so to avoid runtime error its better it breaks at compile time.
+	// to handle this we use static_cast as below
+	int* p2 = static_cast<int*>(&c);
+	return 0;
+}
+
+
+
+*** private inheritance violates inheritance---it acts alike a composition
+
+in case of private inheritance trhere is no is-a relationship.
+so inshort derived is not base class
+so to typecase derived obj into base class is wrong 
+but it is done with c-style casting which is wrong.
+SO to avoid it we shud use static_cast so that it can be avoided.
+
+
+class person
+{
+
+};
+
+class student :private person
+{
+
+};
+
+void eat(const person& ref) //anyone can eat
+{
+	cout << "eat" << endl;
+}
+void study(const student& ref) //students only studies
+{
+	cout << "study" << endl;
+}
+int main()
+{
+	person p;
+	student s;
+	eat(p);
+	eat((person &)s);  // c-style cast which is not recommnend
+
+	/*static_cast*/
+
+	person obj = static_cast<person>(s);
+	//immediatly it gives compile time error as conversion to inaccessible base class is not allowed
+
+	study(s);
+}
+
+
+--------------------------------------------------------------------------------------
+
+RTTI -- dynamic casting -- runtime type identification
+
+-- The dynamic_cast operator is mainly used to perform downcasting (converting a pointer/reference of a base class to a derived class). It ensures type safety by performing a runtime check to verify the validity of the conversion.
+
+-- provides a  standard way to determine the type of object during runtime...
+
+-- if thereis polymorphic relationship between the classes i.e base class declared or defined any virtual function 
+and we had created base class pointers to sub class objects .then at sometime we need to cast any of base class pointer into a
+valid sub class pointer then we shud use RTTI/dynamic cast
+
+-- base class has to be a polymorphic
+-- on success :- return new type 
+--on failure--- if pointer then return null
+		if refernce then-- bad_cast exception
+
+class animal
+{
+public:
+	virtual void bark() {}
+};
+class dog :public animal
+{
+public:
+	
+};
+class cat :public animal
+{
+
+};
+int main()
+{
+	animal* a = new dog;
+	animal* b = new cat;
+
+	dog* d = dynamic_cast<dog*>(a);
+}
+
+
+-------------------------
+
+3) const_cast:--  it is used to cast away the const ness of a variable
+
+eg: const int *p  ==>>> int *p
+
+
+
+use cases :-
+	1) passing const data to a function which accepts non-const
+	
+	int fun(int *ptr)
+{
+
+}
+int main()
+{
+	const int a = 5;
+	const int* ptr=&a;
+	fun(ptr);  // theo error as function not accepts const data
+
+	// to avoid that we can use const_cast
+	int* p = const_cast<int*>(ptr);
+	fun(p);
+
+}
+
+
+//if the code is ours then we can change the declaation of function by adding const keyword
+// but if using any lib function..in that case then we have to pass our varibale my removing their constness
+
+
+	2) if we want to change non-const class members inside const member function
+
+class myclass
+{
+	int x;
+public:
+	void test(int no)const
+	{
+		x = no;  // it will not allow  as function is constant
+
+		const_cast<myclass*>(this)->x = no;  // this is way to do that
+	}
+};
+
+
+**** usualyy we shud not try to change the value of const variable , otherwise it leads to undefined behaviour
+
+int main()
+{
+	const int a = 5;
+	const int* ptr=&a;
+
+	int* p2 = const_cast<int*>(ptr);
+	*p2 = 55;
+	cout << *p2 << endl;
+	cout << a << endl;
+
+
+	// below both will print same address bbut above lines will print diff values
+	//it is because for const variable compiler treat it as a macro and at compile time it replaces its value
+	// while print a -- we are not printing the value stored at a we are just printing the macro which is replaced
+	//so the values printed are diff for variable and pointer
+
+	//**** to avoid such behaviour we shud not use const_cast to cast away the ocnstness of a dtaa memeber or a normal variable
+	cout << &a << endl;
+	cout << ptr << endl;
+
+
+}
+
+
+
+
+----------------------------------------------------------------------------------------
+
+*** reinterpret cast
+
+-- allows any pointer to be converted into any pointer
+-- any integral type into poinetr type and vice versa
+
+
+------------------------------------
+/* Difference between typeid and dynamic_cast
+
+typeid does not check complete inheritance hierarchy  i.e it does not use virtual table. Hence if u are using typeid , it is not compulsory to use polymorphic type.
+--it only check till its immediate base class only 
+dynamic_cast can check complete inheritance hierarchy i.e it uses virtual table for this purpose. Hence if u are using dynamic_cast , it you must have polymorphic type.
+
+*/
+
+#include<iostream>
+#include<typeinfo.h>
+using namespace std;
+class base
+{
+public:
+	virtual void disp(){}
+};
+class sub:public base
+{
+	public:
+	void disp()
+	{
+		cout<<endl<<"in disp of sub\n";
+	}
+};
+class sub1:public sub
+{
+public:
+	void disp()
+	{
+		cout<<endl<<"in disp of sub1\n";
+	}
+};
+void main()
+{
+	base *b=new sub1;
+	sub *s1;
+	sub1 *s2;
+	/*s1=dynamic_cast<sub*>(b);
+	if(s1)
+	{
+		s1->disp();
+	}
+	else
+		cout<<"not successful\n";*/
+
+	if(typeid(*b)==typeid(sub))
+		cout<<"equal\n";
+	else
+		cout<<"not equal\n";
+
+}
+	
+------------------------------------------------------------------------------------------------------------------------------
+
+
+**** Namespace:-
+
+Namespace provide the space where we can define or declare identifier i.e. variable,  method, classes.
+--Using namespace, you can define the space or context in which identifiers are defined i.e. variable, method, classes. In essence, a namespace defines a scope.
+
+		Advantage of Namespace to avoid name collision.
+		
+--Example, you might be writing some code that has a function called xyz() and there is another library available which is also having same function xyz(). Now the compiler has no way of knowing which version of xyz() function you are referring to within your code.
+		
+--A namespace is designed to overcome this difficulty and is used as additional information to differentiate similar functions, classes, variables etc. with the same name available in different libraries. 
+		
+--The best example of namespace scope is the C++ standard library (std) where all the classes, methods and templates are declared. Hence while writing a C++ program we usually include the directive using namespace std;
+
+#include<iostream>
+using namespace std;
+
+namespace sp1
+{
+	template<class type>
+	class myclass
+	{
+		type a;
+	public:
+		myclass(type a)
+		{
+			this->a = a;
+		}
+		void disp()
+		{
+			cout << a << endl;
+		}
+	};
+}
+namespace sp2
+{
+	template<class type1, class type2>
+	class myclass
+	{
+		type1 a;
+		type2 b;
+	public:
+		myclass(type1 a, type1 b)
+		{
+			this->a = a;
+			this->b = b;
+		}
+		void disp()
+		{
+			cout << a << "\t" << b << endl;
+		}
+	};
+}
+void main()
+{
+	sp1::myclass<int>m1(20);
+	m1.disp();
+	sp2::myclass<float, int>m2(5.6f,1711);
+	m2.disp();
+}
 
 
 
 
 
-
-
-
-
-
+------------------------------------------------------------------------------------------------------------------------------
 
 
 
