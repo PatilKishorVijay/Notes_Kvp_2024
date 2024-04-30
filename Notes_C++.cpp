@@ -877,8 +877,14 @@ void main()
 }
 	
 ------------------------------------------------------------------------------------------------------------------------------
+*** reinterpret cast ****
 
+	-- allows  any pointer to be converted into any other type
+	-- any integral type to pointer type and vce versa
+	-- can't remove constness of a pointer or reference
+	--
 
+------------------------------------------------------------------------------------------------------------------------------
 **** Namespace:-
 
 Namespace provide the space where we can define or declare identifier i.e. variable,  method, classes.
@@ -945,13 +951,100 @@ void main()
 
 ------------------------------------------------------------------------------------------------------------------------------
 
+*** Template  ****
+
+Template is a mechanism that make it possible to use one function or class to handle many different data types.By using templates,we can design a single class/function for each type. When used with functions they are known as function templates,whereas when used with classes they are called class templates. 
+
+
+Templates
+
+are used to write generic  functions and generic classes
+
+function overloading -writing same operation on different types. 
+
+Drawbacks of Function Overloading
+1)Rewriting the same function body over and over for different type is time consuming.
+2)The program consumes more disk space
+3)If we locate any error in one such function,we need to remember to correct it in each function body.
+
+With template you can write one generic function,which can serve any data type
+
+Template vs Macro
+Templates are typesafe whereas macros are not
+
+function tempate can be a part of class as member function template
+
+
+	class myclass
+{
+public:
+	void disp1()
+	{
+		cout<<endl<<"in disp1\n";
+	}
+	template<class type>
+	void disp2(type a)
+	{
+		cout<<"\n in template fun\t"<<a<<endl;
+	}
+};
+void main()
+{
+	myclass m;
+	m.disp1();
+	int num=50;
+	m.disp2(num);
+	char ch='A';
+	m.disp2(ch);
+}
+------------------------------------------------------------------------------------------
+
+Containers:-- object which handles or contains other objects
+ eg:- vector , map , stack ,queue
+
+	
+
+1) sequnctial :- eg. vector, std::array , stack , queue ,
+2) associative:-
+	ordered:- implemented:-  balanced BST
+		  eg. map , set ,multimap
+			
+
+	unordered :- hash tables	
+		eg . unordered map,unordered set , unordered multimap
+
+--------------------------------------------------------
+
+	****  iterators:- 
+	it is a object that enables traversal of containers in some order for either reading or writing
+1)input iterator
+2)output iterator
+3)forward iterator
+4)bidirectional iterator
+5) random access iterator
+
+
+vector<int>v={12,23,34,45};
+
+v.begin()  -- return iterator to the begining of container   -- 12
+
+v.end() --  ----45
+
+r.begin() -- reverse iterrator 
+          -- returns iterator pointing to first element from last .  -- 45
+e.end()   -- return iterator pointin got last element from right of a containied   --12
+
+***** Iterator invalidation  ******
+
+
+
+********    vector *************
+	-- elements stored in contiguous manner
+	-- storage handled automatically , expnads and contracts as per the need
+	-- more memory needed as compared to static array as more memory needed to handle future growth
 
 
 
 
-
-
-
-
-
+	
 
