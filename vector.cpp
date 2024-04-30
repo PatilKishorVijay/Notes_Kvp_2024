@@ -42,3 +42,100 @@ int main()
 
 
 }
+// // when object are stored in STL ,their copies are stored
+
+
+
+#include<iostream>
+#include<vector>
+using namespace std;
+class MyClass
+{
+	int num;
+public:
+	MyClass()
+	{
+		num=0;
+	}
+	MyClass(int k)
+	{
+		num=k;
+		cout<<endl<<"In parameterized const\n";
+	}
+	void setNum(int num)
+	{
+		this->num=num;
+	}
+	void disp()
+	{
+		cout<<endl<<num<<endl;
+	}
+};
+void main()
+{
+	vector<MyClass> v1;
+	unsigned int i=0,j=10;
+	MyClass m1(100),m2(200);
+	v1.push_back(m1);
+	v1.push_back(m2);
+	m1.setNum(500);
+	m2.setNum(600);
+	cout<<"m1 and m2 values"<<endl;
+	m1.disp();
+	m2.disp();
+	cout<<"vector values"<<endl;
+	for(i=0;i<v1.size();i++)
+	{
+		v1[i].disp();
+	}
+}
+
+
+--------------------------------
+if we create vector of myclass which is polymorphic
+then we shud ccreate vector of pointer of myclass...push_back addresses of myclass objects
+
+with this iterator  becomes double pointer ...(**itr).disp();
+#include<iostream>
+#include<vector>
+using namespace std;
+class base
+{
+public:
+	virtual void disp()
+	{
+		cout << "in base disp" << endl;
+	}
+};
+class sub :public base
+{
+public:
+	void disp()
+	{
+		cout << "in sub disp" << endl;
+	}
+};
+class sub1 :public base
+{
+public:
+	void disp()
+	{
+		cout << "in sub1 disp" << endl;
+	}
+};
+int main()
+{
+	vector<base*> v;
+	base b;
+	sub s;
+	sub1 s1;
+	v.push_back(&b);
+	v.push_back(&s);
+	v.push_back(&s1);
+	vector<base*>::iterator itr = v.begin();
+	for (itr=v.begin(); itr != v.end(); itr++)
+	{
+		(**itr).disp();
+	}
+}
+-------------------------------------
