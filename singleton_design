@@ -1,5 +1,10 @@
 // nbdeploylogger.h
-
+/*
+-- to restrict code to create only 1 object
+-- make constructor , CC , assignment = operator as private
+--  in case of multiple therads make sure only 1 object get created
+	-- for this use mutex lock and also doubloc lock check...so  that unnecessary lock createion can be avoided in case if object is already created...because lock creation is costly as perspective from performance.
+*/
 #pragma once
 #include"Common.h"
 #include<mutex>
