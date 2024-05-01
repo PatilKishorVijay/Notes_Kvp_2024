@@ -2,7 +2,14 @@
 #include <vector>
 
 using namespace std;
+/*
+-- without factory object creation was taking place in client code..
+so in down the line if new  class introduced then we have to again change the cleint code
 
+-- after creating factory class which creates the object and just reurn to client  , the tight coupling betweween cleint and object creation process gets loosen
+
+
+*/
 class Workload
 {
 public:
@@ -54,3 +61,4 @@ int main()
 	Workload* wd = WorkloadFactory::getWorkload(type);
 	wd->takeBackup();
 }
+
