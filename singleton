@@ -1,0 +1,88 @@
+// nbdeploylogger.h
+
+#pragma once
+#include"Common.h"
+#include<mutex>
+
+class nbdeployLogger
+{
+	static nbdeployLogger* logger;
+	static mutex mtx;
+	static int cnt;
+	nbdeployLogger();
+public:
+	static nbdeployLogger* getLogger();
+	void log(string logmsg);
+
+};
+
+//nbdeploylogger.cpp
+
+#include "nbdeployLogger.h"
+
+
+nbdeployLogger* nbdeployLogger::getLogger()
+{
+	// therad safe and double lock check 
+
+	if (logger == nullptr)
+	{
+		mtx.lock();
+		if (logger == nullptr)
+		{
+			logger = new nbdeployLogger;
+		}
+		mtx.unlock();
+	}
+
+
+	/*if (logger == nullptr)
+	{
+		logger = new nbdeployLogger;
+	}*/
+	return logger;
+}
+
+nbdeployLogger* nbdeployLogger::logger = nullptr;
+int nbdeployLogger::cnt = 0;
+
+void nbdeployLogger::log(string logmsg)
+{
+	cout << logmsg << endl;
+}
+
+mutex nbdeployLogger::mtx;
+nbdeployLogger::nbdeployLogger()
+{
+	cnt++;
+	cout << "instance count -- " << cnt<<endl;
+}
+
+
+//cleint.cpp
+
+#include <vector>
+#include "nbdeployLogger.h"
+#include<thread>
+
+using namespace std;
+
+void fun1()
+{
+	nbdeployLogger* logger = nbdeployLogger::getLogger();
+	logger->log("log for fun1");
+}
+
+void fun2()
+{
+	nbdeployLogger* logger = nbdeployLogger::getLogger();
+	logger->log("log for fun2");
+}
+
+int main()
+{
+	thread t1(fun1);
+	thread t2(fun2);
+	t1.join();
+	t2.join();
+}
