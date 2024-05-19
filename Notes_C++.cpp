@@ -740,7 +740,12 @@ int main()
 }
 
 
--------------------------
+---------------------------------------------------------------------------
+
+--- static_cast is preferable for simple, non-polymorphic conversions and upcasting, where type safety is ensured by the programmer.
+--  dynamic_cast should be used in scenarios with polymorphic class hierarchies for downcasting, offering safety checks at the cost of performance.
+
+---------------------------------------------------------------------------
 
 3) const_cast:--  it is used to cast away the const ness of a variable
 
