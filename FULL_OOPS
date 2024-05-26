@@ -1,0 +1,74 @@
+#include<iostream>
+#include<vector>
+using namespace std;
+
+
+class Vehicle
+{
+protected:
+	string model;
+public:
+	Vehicle(string name) :model(name)
+	{
+
+	}
+	string getModel()
+	{
+		return model;
+	}
+	virtual void accelerate() = 0;
+	virtual ~Vehicle()
+	{
+		cout << "dtcor of vehicle" << endl;
+	}
+};
+
+class Car :public Vehicle
+{
+public:
+	Car(string _name) :Vehicle(_name) {}
+	~Car() {}
+	void accelerate()
+	{
+		cout << " car model " << model << " accelerated very smoothly" << endl;
+	}
+
+};
+
+class Bike :public Vehicle
+{
+public:
+	Bike(string _name) :Vehicle(_name) {}
+	~Bike() {}
+	void accelerate()
+	{
+		cout << " Bike model " << model << " accelerated very smoothly" << endl;
+	}
+};
+
+void drive(Car& car)
+{
+	cout << "driving car model " << car.getModel() << endl;
+}
+
+void drive( Bike &bike)
+{
+	cout << "driving bike model " << bike.getModel() << endl;
+}
+
+
+int main()
+{
+	vector<Vehicle*> vehicles;
+	vehicles.push_back(new Car("venue"));
+	vehicles.push_back(new Bike("Activa"));
+
+	for (auto* v : vehicles)
+	{
+		if (Car* c = dynamic_cast<Car*>(v))
+			c->accelerate();
+		else if (Bike* b = dynamic_cast<Bike*>(v))
+			b->accelerate();
+	}
+
+}
