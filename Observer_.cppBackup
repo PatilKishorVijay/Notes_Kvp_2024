@@ -1,0 +1,54 @@
+#include<iostream>
+#include<vector>
+#include<list>
+#include<mutex>
+#include<string>
+using namespace std;
+
+
+
+class IWorkloads
+{
+public:
+	virtual void takeBackup() = 0;
+};
+
+class MSWindows :public IWorkloads
+{
+public:
+	void takeBackup()
+	{
+		cout << "initialize ms windows way of taking backup" << endl;
+	}
+};
+
+class Oracle :public IWorkloads
+{
+public:
+	void takeBackup()
+	{
+		cout << "initialize Oracle way of taking backup" << endl;
+	}
+};
+
+class BackupFactory
+{
+public:
+	static IWorkloads* getBackupObjects(const string type)
+	{
+		if (type == "MS Windows")
+			return new MSWindows();
+		else if (type=="Oracle")
+		{
+			return new Oracle();
+		}
+	}
+};
+
+int main()
+{
+	string str;
+	getline(cin,str);
+	IWorkloads* workload1 = BackupFactory::getBackupObjects(str);
+	workload1->takeBackup();
+}
