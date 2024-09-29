@@ -1,0 +1,33 @@
+
+
+Gdb and  valgrind:-
+
+
+For crash  accessing nullpointer or dangling pointer
+
+ulimit -c unlimited
+
+normal command is – g++ first.cpp -o a.out
+but for coredump:-
+
+g++ -g first.cpp -o crash.out
+
+
+./crash.out
+
+
+It will generate coredump…
+
+.
+
+Gdb  ./crash.out core.dump
+
+It will give you the cause……
+
+For memory leak :-  
+
+Compile program by enabling -g flag
+
+G++ -g first.cpp -o a.out
+
+Valgrind --leak-check=full ./a.out
