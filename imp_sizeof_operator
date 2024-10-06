@@ -1,0 +1,22 @@
+
+template<class T>
+int mysizeof()
+{
+	T* ptr = nullptr;
+	T* ptr2 = ptr + 1;
+	int size = (char*)(ptr2)-(char*)(ptr);
+	cout << size << endl;
+	return size;
+}
+
+template<class T1,int N>
+void mysizeof(T1(&)[N])
+{
+	cout << mysizeof<T1>() * N << endl;
+}
+
+int main()
+{
+	int arr[] = { 12,23,34 ,35};
+	mysizeof(arr);
+}
