@@ -1,0 +1,106 @@
+#include"Includes.h"
+
+using namespace std;
+
+
+class CoffeeMachine
+{
+protected:
+	int waterLevel;
+	int coffeeBeans;
+	int cnt=0;
+
+public:
+	CoffeeMachine(int w, int b) :waterLevel(w), coffeeBeans(b) {}
+	virtual void brewCoffee() = 0;
+
+	void checkResources()
+	{
+		cout << "waterlevel " << waterLevel << " bean " << coffeeBeans << "\n";
+	}
+
+	void getCoffeeCount()
+	{
+		cout << "coffee count is " << cnt << endl;
+	}
+	virtual ~ CoffeeMachine() {}
+};
+
+
+
+class EspressoMachine :public CoffeeMachine
+{
+public:
+	EspressoMachine(int w, int c) :CoffeeMachine(w, c) {}
+
+	void brewCoffee()override
+	{
+		if (waterLevel > 30 && coffeeBeans > 15)
+		{
+			cnt++;
+			waterLevel -= 30;
+			coffeeBeans -= 10;
+			cout << "breweing a strong espresso\n";
+		}
+		else
+		{
+			cout << "not enough water or beans\n";
+		}
+	}
+
+	~EspressoMachine()
+	{
+		cout << "dctor for expresso called\n";
+	}
+
+};
+
+class LatteMachine :public CoffeeMachine
+{
+public:
+	LatteMachine(int w, int c) :CoffeeMachine(w, c) {}
+
+	void brewCoffee()override
+	{
+		if (waterLevel > 30 && coffeeBeans > 15)
+		{
+			cnt++;
+			waterLevel -= 30;
+			coffeeBeans -= 10;
+			cout << "breweing a strong Latte\n";
+		}
+		else
+		{
+			cout << "not enough water or beans\n";
+		}
+	}
+
+	~LatteMachine()
+	{
+		cout << "dctor for latte called\n";
+	}
+};
+
+
+void makeCoffee(CoffeeMachine &machine)
+{
+	machine.brewCoffee();
+	machine.checkResources();
+}
+
+
+int main()
+{
+	EspressoMachine espresso(100, 50);
+	LatteMachine latte(100, 50);
+	makeCoffee(espresso);
+	makeCoffee(espresso);
+
+	makeCoffee(latte);
+
+	espresso.getCoffeeCount();
+	latte.getCoffeeCount();
+
+
+
+}
