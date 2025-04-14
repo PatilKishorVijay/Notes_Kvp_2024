@@ -1,3 +1,35 @@
+
+
+	vector<int> vect = { 12,23,34,45,56,34 };
+
+	for (auto x : vect)
+	{
+		cout << x << " ";
+	}
+
+	cout << endl;
+
+	vect.erase(remove(vect.begin(),vect.end(),34), vect.end());
+	for (auto x : vect)
+	{
+		cout << x << " ";
+	}
+
+std::remove is an algorithm from the <algorithm> header.
+
+It reorders the vector so that all elements not equal to 34 are moved to the front, and returns an iterator to the new logical end of the "valid" range.
+
+	in short at backend --- 12,23,45,56,34,34  (remove returns 4 as starting index to erase function )
+
+It doesn’t actually erase anything—it just "marks" the redundant elements past the returned iterator.
+
+	vect.erase(start_iterator, end_iterator)
+
+start_iteratot gets -- 4 as address from remove function 
+end_iterator -- gets from vect.end()
+
+
+---------------------------------------------------------------------------
 #include<iostream>
 using namespace std;
 #include<vector>
